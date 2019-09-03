@@ -16,7 +16,7 @@ class AbstractModel:
         # Override this method in derived classes.
         pass
 
-    def predict(self, repo: vul_classify.repr.Repository) -> np.ndarray:
+    def predict(self, target: vul_classify.repr.Program) -> np.ndarray:
         pass
 
 
@@ -29,7 +29,18 @@ class WeightedMajorityVoting(AbstractModel):
         # TODO: Concurrency training
         pass
 
-    def predict(self, repo: vul_classify.repr.Repository) -> np.ndarray:
+    def predict(self, target: vul_classify.repr.Program) -> np.ndarray:
         # TODO: Concurrency prediction
-        y = np.vstack(list(map(lambda m: m.predict(repo), self._models)))
+        y = np.vstack(list(map(lambda m: m.predict(target), self._models)))
         return softmax(np.matmul(self._w, y))
+
+
+class NaiveModel(AbstractModel):
+    def __init__(self):
+        self._repo = None
+
+    def train(self, repo: vul_classify.repr.Repository) -> None:
+        self._repo = repo
+
+    def predict(self, target: vul_classify.repr.Program) -> np.ndarray:
+        pass
