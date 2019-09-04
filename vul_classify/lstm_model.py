@@ -87,7 +87,7 @@ class LSTMModel(AbstractModel):
         else:
             feature = torch.tensor(feature, dtype=torch.float32)
         _, pred = model.forward(feature, seq_length)
-        return int(torch.argmax(pred)[0])
+        return pred.detach().numpy()
 
     def evaluate(self, repo, load_path):
         batch_generator = BatchGenerator(repo=repo, mode='test')
