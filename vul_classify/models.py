@@ -3,7 +3,7 @@ from typing import *
 import numpy as np
 
 import vul_classify.repr
-import vul_classify.concurrent
+import vul_classify.thread_pool
 
 
 def softmax(v: np.ndarray) -> np.ndarray:
@@ -35,13 +35,13 @@ class WeightedMajorityVoting(AbstractModel):
         def train_model(model: AbstractModel) -> None:
             model.train(repo)
 
-        vul_classify.concurrent.get_thread_pool().map(train_model, *self._models)
+        vul_classify.thread_pool.get_thread_pool().map(train_model, *self._models)
 
     def predict(self, target: vul_classify.repr.Program) -> np.ndarray:
         def predict_by(model: AbstractModel) -> np.ndarray:
             return model.predict(target)
 
-        predictions = list(vul_classify.concurrent.get_thread_pool().map(predict_by, self._models))
+        predictions = list(vul_classify.thread_pool.get_thread_pool().map(predict_by, self._models))
         y = np.vstack(predictions)
         return softmax(np.matmul(self._w, y))
 

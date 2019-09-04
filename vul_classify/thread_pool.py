@@ -2,7 +2,7 @@ from typing import *
 from concurrent.futures import ThreadPoolExecutor
 
 
-_global_thread_pool: Optional[ThreadPoolExecutor] = None;
+_global_thread_pool: Optional[ThreadPoolExecutor] = None
 
 
 def init_thread_pool(max_threads: int = 10):
