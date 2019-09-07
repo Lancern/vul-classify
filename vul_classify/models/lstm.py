@@ -1,9 +1,12 @@
-from models import AbstractModel
-import vul_classify.repr
+import math
+
 import numpy as np
+
 import torch
 import torch.nn as nn
 from torch import optim
+
+from .base import AbstractModel
 
 
 def transform(prog, precesion=.01):
