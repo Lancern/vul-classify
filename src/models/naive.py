@@ -1,18 +1,89 @@
-from .base import AbstractModel
+from typing import *
 
 import numpy as np
 
 from ..asm import Repository
 from ..asm import Program
+from ..asm import ProgramTag
+from ..asm import Function
+from ..asm import collect_functions
+
+from .base import AbstractModel
+from .utils import softmax
+from .utils import cosine_similarity
 
 
 class NaiveModel(AbstractModel):
-    def __init__(self):
+    class NaiveModelParams:
+        def __init__(self, **kwargs):
+            self.sim_threshold = kwargs.get('sim_threshold', 0.6)
+
+    def __init__(self, **kwargs):
         self._repo = None
+        self._params = self.__class__.NaiveModelParams(**kwargs)
 
     def train(self, repo: Repository) -> None:
         self._repo = repo
 
+    def _dim(self) -> int:
+        return len(self._repo.tags())
+
+    def _find_tag(self, tag: ProgramTag) -> int:
+        for (i, t) in enumerate(self._repo.tags()):
+            if tag == t:
+                return i
+        return -1
+
+    def _predict_func(self, f: Function) -> Dict[ProgramTag, int]:
+        matched_tags = dict()
+        for prog in self._repo.programs():
+            if not prog.tag().is_vul():
+                continue
+
+            prog_funcs = collect_functions(prog.entry())
+            for pf in prog_funcs:
+                sim = cosine_similarity(f.vec(), pf.vec())
+                if sim >= self._params.sim_threshold:
+                    func_tag = prog.tag()
+                    if func_tag in matched_tags:
+                        matched_tags[func_tag] += 1
+                    else:
+                        matched_tags[func_tag] = 1
+
+        return matched_tags
+
     def predict(self, target: Program) -> np.ndarray:
-        # TODO: Implement Naive Model.
+        target_funcs = collect_functions(target.entry())
+
+        matched_tags = dict()
+        for tf in target_funcs:
+            func_tags = self._predict_func(tf)
+            for (tag, count) in func_tags.items():
+                if tag in matched_tags:
+                    matched_tags[tag] += count
+                else:
+                    matched_tags[tag] = count
+
+        result = np.zeros(self._dim())
+        if len(matched_tags) == 0:
+            # Find the index of the tag that represents a safe program.
+            for (i, t) in enumerate(self._repo.tags()):
+                if not t.is_vul():
+                    result[i] = 1
+                    break
+            return result
+        else:
+            for (t, count) in matched_tags.items():
+                tag_index = self._find_tag(t)
+                if tag_index == -1:
+                    continue
+                result[tag_index] = count
+            return softmax(result)
+
+    def serialize(self) -> Any:
+        # TODO: Serialize repository.
+        pass
+
+    def deserialize(self, rep: Any) -> None:
+        # TODO: Deserialize repository.
         pass
