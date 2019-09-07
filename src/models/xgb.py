@@ -32,7 +32,7 @@ class XGBModel(AbstractModel):
         for program in programs:
             funcs = collect_functions(program.entry())
             vecs = [func.vec() for func in funcs]
-            
+
         X_train.append(_all_reduce(vecs))
         y_train.append(program.tag())
                 
