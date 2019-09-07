@@ -109,3 +109,6 @@ def collect_functions(entry: Function) -> List[Function]:
 
     walk_functions(entry, handler)
     return fn
+
+
+__all__ = [Function, ProgramTag, Program, Repository, walk_functions, collect_functions]

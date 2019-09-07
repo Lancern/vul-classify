@@ -2,8 +2,8 @@ from typing import *
 
 import numpy as np
 
-from ..repr import Repository
-from ..repr import Program
+from ..asm import Repository
+from ..asm import Program
 from ..thread_pool import get_thread_pool
 
 from .base import AbstractModel

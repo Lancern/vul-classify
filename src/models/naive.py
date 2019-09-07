@@ -2,8 +2,8 @@ from .base import AbstractModel
 
 import numpy as np
 
-from ..repr import Repository
-from ..repr import Program
+from ..asm import Repository
+from ..asm import Program
 
 
 class NaiveModel(AbstractModel):

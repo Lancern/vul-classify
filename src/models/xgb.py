@@ -1,7 +1,7 @@
 import numpy as np
 import xgboost as xgb
 
-from ..repr import collect_functions
+from ..asm import collect_functions
 
 from .base import AbstractModel
 

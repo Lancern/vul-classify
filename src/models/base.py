@@ -1,7 +1,7 @@
 import numpy as np
 
-from ..repr import Repository
-from ..repr import Program
+from ..asm import Repository
+from ..asm import Program
 
 
 class AbstractModel:

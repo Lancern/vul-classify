@@ -2,3 +2,4 @@ numpy
 flask
 xgboost
 torch
+r2pipe
