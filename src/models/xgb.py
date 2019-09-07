@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import xgboost as xgb
 
@@ -17,7 +18,7 @@ def _all_reduce(vecs):
     
     return X
 
-    
+
 class XGBModel(AbstractModel):
     def __init__(self, **kwargs):
         self._model = xgb.XGBClassifier(**kwargs)
@@ -32,17 +33,17 @@ class XGBModel(AbstractModel):
         for program in programs:
             funcs = collect_functions(program.entry())
             vecs = [func.vec() for func in funcs]
-
+        
         X_train.append(_all_reduce(vecs))
         y_train.append(program.tag())
-                
+
         X_train = np.array(X_train)
         y_train = np.array(y_train)
         
         self._model.fit(X_train, y_train,
                         eval_set=[(X_train, y_train)],
                         eval_metric='mlogloss')
-            
+
     def predict(self, target):
         funcs = collect_functions(target.entry())
         vecs = [func.vecs() for func in funcs]
@@ -54,3 +55,8 @@ class XGBModel(AbstractModel):
         
         return pred
 
+    def save_model(self, model_dir='model/xgb_model'):
+        self._model.save_model(model_dir)
+
+    def load_model(self, model_dir='model/xgb_model'):
+        self._model.load_model(model_dir)
