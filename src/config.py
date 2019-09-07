@@ -9,7 +9,18 @@ class ConfigurationManager:
             self._entries = json.load(fp)
 
     def get(self, name: str, default: Any = None) -> Any:
-        return self._entries.get(name, default)
+        # name should be interpreted as a dot-separated sequence of configuration entry names.
+        path = name.split('.')
+        entry = self._entries
+        for component in path:
+            if component in entry:
+                entry = entry[component]
+            else:
+                break
+        else:
+            return entry
+
+        return default
 
 
 global_config: Optional[ConfigurationManager] = None
