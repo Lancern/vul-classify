@@ -37,3 +37,6 @@ def disassemble(binary_file: str, output_file: str):
 
                     instr = re.search(r'([^;]*)', instr).group(0)
                     output_fp.write('\t{}\n'.format(instr))
+
+
+__all__ = ['disassemble']

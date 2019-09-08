@@ -2,11 +2,11 @@ from typing import *
 
 import numpy as np
 
-from ..asm import Repository
-from ..asm import Program
-from ..asm import ProgramTag
-from ..asm import Function
-from ..asm import collect_functions
+from vulcls.asm import Repository
+from vulcls.asm import Program
+from vulcls.asm import ProgramTag
+from vulcls.asm import Function
+from vulcls.asm import collect_functions
 
 from .base import AbstractModel
 from .utils import softmax
@@ -23,7 +23,8 @@ class NaiveModel(AbstractModel):
         self._params = self.__class__.NaiveModelParams(**kwargs)
 
     def train(self, repo: Repository) -> None:
-        self._repo = repo
+        # Nothing to do here.
+        pass
 
     def _dim(self) -> int:
         return len(self._repo.tags())
@@ -53,6 +54,7 @@ class NaiveModel(AbstractModel):
         return matched_tags
 
     def predict(self, repo: Repository, target: Program) -> np.ndarray:
+        self._repo = repo
         target_funcs = collect_functions(target.entry())
 
         matched_tags = dict()
@@ -87,3 +89,6 @@ class NaiveModel(AbstractModel):
     def deserialize(self, rep: Any) -> None:
         # Nothing to do here.
         pass
+
+
+__all__ = ['NaiveModel']

@@ -16,3 +16,6 @@ def get_thread_pool() -> ThreadPoolExecutor:
 
 def shutdown_thread_pool():
     _global_thread_pool.shutdown()
+
+
+__all__ = ['init_thread_pool', 'get_thread_pool', 'shutdown_thread_pool']

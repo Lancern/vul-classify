@@ -1,9 +1,7 @@
-from typing import *
-
 import numpy as np
 
-from ..asm import Repository
-from ..asm import Program
+from vulcls.asm import Repository
+from vulcls.asm import Program
 
 
 class AbstractModel:
@@ -15,12 +13,15 @@ class AbstractModel:
         # Override this method in derived classes.
         pass
 
-    def serialize(self) -> Any:
+    def serialize(self, file_name: str) -> None:
         # Override this method in derived classes to serialize the internal state of the model
-        # into primitive values.
+        # into the given file.
         pass
 
-    def populate(self, rep: Any) -> None:
+    def populate(self, file_name: str) -> None:
         # Override this method in derived classes to deserialize the internal state of the model
-        # from primitive values.
+        # from the given file.
         pass
+
+
+__all__ = ['AbstractModel']

@@ -2,7 +2,7 @@ import os
 import numpy as np
 import xgboost as xgb
 
-from ..asm import collect_functions
+from vulcls.asm import collect_functions
 
 from .base import AbstractModel
 
@@ -61,3 +61,5 @@ class XGBModel(AbstractModel):
 
     def load_model(self, model_dir='model/xgb_model'):
         self._model.load_model(model_dir)
+
+__all__ = ['XGBModel']

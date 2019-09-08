@@ -2,9 +2,9 @@ from typing import *
 
 import numpy as np
 
-from ..asm import Repository
-from ..asm import Program
-from ..thread_pool import get_thread_pool
+from vulcls.asm import Repository
+from vulcls.asm import Program
+from vulcls.thread_pool import get_thread_pool
 
 from .base import AbstractModel
 from .utils import softmax
@@ -36,3 +36,6 @@ class WeightedMajorityVoting(AbstractModel):
     def deserialize(self, rep: Any) -> None:
         # Nothing to do here.
         pass
+
+
+__all__ = ['WeightedMajorityVoting']
