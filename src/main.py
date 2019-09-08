@@ -8,6 +8,8 @@ from .config import init_config
 from .config import app_config
 from .thread_pool import init_thread_pool as init_tp
 
+from .httpd.app import start_httpd
+
 
 if __name__ != '__main__':
     raise Exception('main.py should not be imported as a module.')
@@ -79,7 +81,10 @@ def main(argv: List[str]) -> int:
     # Initialize thread pool.
     init_thread_pool()
 
-    # TODO: Implement main.
+    # TODO: Initialize models.
+
+    # Start the HTTP daemon.
+    start_httpd()
 
     return 0
 

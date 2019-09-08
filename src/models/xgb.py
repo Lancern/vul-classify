@@ -43,7 +43,7 @@ class XGBModel(AbstractModel):
                         eval_set=[(X_train, y_train)],
                         eval_metric='mlogloss')
             
-    def predict(self, target):
+    def predict(self, repo, target):
         funcs = collect_functions(target.entry())
         vecs = [func.vecs() for func in funcs]
         

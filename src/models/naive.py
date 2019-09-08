@@ -52,7 +52,7 @@ class NaiveModel(AbstractModel):
 
         return matched_tags
 
-    def predict(self, target: Program) -> np.ndarray:
+    def predict(self, repo: Repository, target: Program) -> np.ndarray:
         target_funcs = collect_functions(target.entry())
 
         matched_tags = dict()
@@ -81,9 +81,9 @@ class NaiveModel(AbstractModel):
             return softmax(result)
 
     def serialize(self) -> Any:
-        # TODO: Serialize repository.
-        pass
+        # Nothing to do here.
+        return None
 
     def deserialize(self, rep: Any) -> None:
-        # TODO: Deserialize repository.
+        # Nothing to do here.
         pass

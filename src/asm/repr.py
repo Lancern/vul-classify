@@ -16,8 +16,16 @@ class Function:
     def callees(self) -> List['Function']:
         return self._callees
 
+    def add_callee(self, callee: 'Function') -> None:
+        self._callees.append(callee)
+        callee._callers.append(self)
+
     def callers(self) -> List['Function']:
         return self._callers
+
+    def add_caller(self, caller: 'Function') -> None:
+        self._callers.append(caller)
+        caller._callees.append(self)
 
     def vec(self) -> np.ndarray:
         return self._v
@@ -111,4 +119,59 @@ def collect_functions(entry: Function) -> List[Function]:
     return fn
 
 
-__all__ = [Function, ProgramTag, Program, Repository, walk_functions, collect_functions]
+def serialize_repo(repo: Repository) -> Dict[str, Any]:
+    programs_rep = []
+    for prog in repo.programs():
+        prog_rep = {
+            'name': prog.name(),
+            'tag': prog.tag().vul_category(),
+            'funcs': [],
+            'entry': prog.entry().id()
+        }
+
+        for func in collect_functions(prog.entry()):
+            func_rep = {
+                'id': func.id(),
+                'vec': list(func.vec()),
+                'callees': list(map(lambda f: f.id(), func.callees()))
+            }
+            prog_rep['funcs'].append(func_rep)
+
+        programs_rep.append(prog_rep)
+
+    return {'programs': programs_rep}
+
+
+def deserialize_repo(rep: Dict[str, Any]) -> Repository:
+    repo = Repository()
+
+    for prog_rep in rep['programs']:
+        name = prog_rep['name']
+        tag = ProgramTag(prog_rep['tag'])
+        entry = prog_rep['entry']
+
+        # Deserialize function call graph.
+        funcs = dict()
+        func_callees = dict()
+        for func_rep in prog_rep['funcs']:
+            fid = func_rep['id']
+            vec = np.array(func_rep['vec'])
+            callees = func_rep['callees']
+
+            func_callees[fid] = callees
+            funcs[fid] = Function(fid, vec)
+
+        # Fix function call relations.
+        for f in funcs:
+            for callee_id in func_callees[f.id()]:
+                f.add_callee(funcs[callee_id])
+
+        prog = Program(name, funcs[entry])
+        prog.set_tag(tag)
+        repo.add_program(prog)
+
+    return repo
+
+
+__all__ = [Function, ProgramTag, Program, Repository, walk_functions, collect_functions,
+           serialize_repo, deserialize_repo]
