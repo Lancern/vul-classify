@@ -173,5 +173,5 @@ def deserialize_repo(rep: Dict[str, Any]) -> Repository:
     return repo
 
 
-__all__ = [Function, ProgramTag, Program, Repository, walk_functions, collect_functions,
-           serialize_repo, deserialize_repo]
+__all__ = ['Function', 'ProgramTag', 'Program', 'Repository', 'walk_functions', 'collect_functions',
+           'serialize_repo', 'deserialize_repo']

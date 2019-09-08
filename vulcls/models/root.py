@@ -16,4 +16,4 @@ def get_root_model():
     return _root
 
 
-__all__ = [init_root_model, get_root_model]
+__all__ = ['init_root_model', 'get_root_model']

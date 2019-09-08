@@ -17,4 +17,4 @@ def load_model_object(py_file: str, model_name: str) -> AbstractModel:
     return model_cls()
 
 
-__all__ = [load_model_object]
+__all__ = ['load_model_object']

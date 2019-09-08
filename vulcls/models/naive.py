@@ -2,11 +2,11 @@ from typing import *
 
 import numpy as np
 
-from ..asm import Repository
-from ..asm import Program
-from ..asm import ProgramTag
-from ..asm import Function
-from ..asm import collect_functions
+from vulcls.asm import Repository
+from vulcls.asm import Program
+from vulcls.asm import ProgramTag
+from vulcls.asm import Function
+from vulcls.asm import collect_functions
 
 from .base import AbstractModel
 from .utils import softmax
@@ -89,3 +89,6 @@ class NaiveModel(AbstractModel):
     def deserialize(self, rep: Any) -> None:
         # Nothing to do here.
         pass
+
+
+__all__ = ['NaiveModel']

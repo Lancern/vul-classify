@@ -9,3 +9,6 @@ def softmax(v: np.ndarray) -> np.ndarray:
 
 def cosine_similarity(lhs: np.ndarray, rhs: np.ndarray) -> np.ndarray:
     return np.dot(lhs, rhs) / (np.linalg.norm(lhs) * np.linalg.norm(rhs))
+
+
+__all__ = ['softmax', 'cosine_similarity']

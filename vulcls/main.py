@@ -4,14 +4,14 @@ import sys
 import logging
 import argparse
 
-from .config import init_config
-from .config import app_config
-from .thread_pool import init_thread_pool as init_tp
+from vulcls.config import init_config
+from vulcls.config import app_config
+from vulcls.thread_pool import init_thread_pool as init_tp
 
-from .models import init_root_model
-from .models import load_model_object
+from vulcls.models import init_root_model
+from vulcls.models import load_model_object
 
-from .httpd.app import start_httpd
+from vulcls.httpd.app import start_httpd
 
 
 if __name__ != '__main__':

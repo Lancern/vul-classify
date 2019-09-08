@@ -33,3 +33,6 @@ def init_config(file_name: str) -> None:
 
 def app_config() -> ConfigurationManager:
     return global_config
+
+
+__all__ = ['init_config', 'app_config']

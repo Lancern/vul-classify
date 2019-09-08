@@ -1,7 +1,7 @@
 import numpy as np
 import xgboost as xgb
 
-from ..asm import collect_functions
+from vulcls.asm import collect_functions
 
 from .base import AbstractModel
 
@@ -54,3 +54,5 @@ class XGBModel(AbstractModel):
         
         return pred
 
+
+__all__ = ['XGBModel']
