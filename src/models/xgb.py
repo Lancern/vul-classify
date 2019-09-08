@@ -43,17 +43,18 @@ class XGBModel(AbstractModel):
         self._model.fit(X_train, y_train,
                         eval_set=[(X_train, y_train)],
                         eval_metric='mlogloss')
+            
+    def predict(self, repo, target):
+        self.train(repo)
 
-    def predict(self, target):
         funcs = collect_functions(target.entry())
         vecs = [func.vecs() for func in funcs]
         
         X_test = np.array([_all_reduce(vecs)])
         
-        y_pred = self._model.predict(X_test)
-        pred = [1 if y_pred[0] == tag else 0 for tag in self._tags]
+        y_pred = self._model.predict_proba(X_test)
         
-        return pred
+        return y_pred
 
     def save_model(self, model_dir='model/xgb_model'):
         self._model.save_model(model_dir)

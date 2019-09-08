@@ -11,7 +11,7 @@ class AbstractModel:
         # Override this method in derived classes.
         pass
 
-    def predict(self, target: Program) -> np.ndarray:
+    def predict(self, repo: Repository, target: Program) -> np.ndarray:
         # Override this method in derived classes.
         pass
 

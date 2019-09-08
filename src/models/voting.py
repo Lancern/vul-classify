@@ -21,10 +21,18 @@ class WeightedMajorityVoting(AbstractModel):
 
         get_thread_pool().map(train_model, *self._models)
 
-    def predict(self, target: Program) -> np.ndarray:
+    def predict(self, repo: Repository, target: Program) -> np.ndarray:
         def predict_by(model: AbstractModel) -> np.ndarray:
-            return model.predict(target)
+            return model.predict(repo, target)
 
         predictions = list(get_thread_pool().map(predict_by, self._models))
         y = np.vstack(predictions)
         return softmax(np.matmul(self._w, y))
+
+    def serialize(self) -> Any:
+        # Nothing to do here.
+        return None
+
+    def deserialize(self, rep: Any) -> None:
+        # Nothing to do here.
+        pass

@@ -74,7 +74,7 @@ class LSTMModel(AbstractModel):
                 model.load(save_path)
             torch.cuda.empty_cache()
 
-    def predict(self, prog):
+    def predict(self, repo, prog):
         feature = transform(prog)
         assert len(feature.shape) == 3 and feature.shape[0] == 1, "feature must be [1, seq_length, feat_dim]"
         model = Model(feat_dim=feature.shape[-1])
