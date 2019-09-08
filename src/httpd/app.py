@@ -10,11 +10,10 @@ def index():
 
 @app.route('/classify', methods=['POST'])
 def classify():
-    file_path = bytes.decode(flask.request.data)
+    file_path = bytes.decode(flask.request.args['path'])
     with open(file_path, 'rb') as fp:
         program_text = fp.read()
 
-    # print(program)
     # TODO: Implement classify request handler.
 
 
