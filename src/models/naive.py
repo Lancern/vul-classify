@@ -23,7 +23,8 @@ class NaiveModel(AbstractModel):
         self._params = self.__class__.NaiveModelParams(**kwargs)
 
     def train(self, repo: Repository) -> None:
-        self._repo = repo
+        # Nothing to do here.
+        pass
 
     def _dim(self) -> int:
         return len(self._repo.tags())
@@ -53,6 +54,7 @@ class NaiveModel(AbstractModel):
         return matched_tags
 
     def predict(self, repo: Repository, target: Program) -> np.ndarray:
+        self._repo = repo
         target_funcs = collect_functions(target.entry())
 
         matched_tags = dict()
