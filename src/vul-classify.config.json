@@ -1,0 +1,27 @@
+{
+  "logging": {
+    "level": "DEBUG",
+    "file": "vul-classify-daemon.log"
+  },
+  "thread_pool": {
+    "workers": 10
+  },
+  "models": [
+    {
+      "file": "models/naive.py",
+      "name": "NaiveModel"
+    },
+    {
+      "file": "models/lstm.py",
+      "name": "LSTMModel"
+    },
+    {
+      "file": "models/xgb.py",
+      "name": "XGBModel"
+    }
+  ],
+  "daemon": {
+    "address": "127.0.0.1",
+    "port": 8080
+  }
+}
