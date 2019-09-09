@@ -37,9 +37,6 @@ class NaiveModel(AbstractModel):
     def _predict_func(self, f: Function) -> Dict[ProgramTag, int]:
         matched_tags = dict()
         for prog in self._repo.programs():
-            if not prog.tag().is_vul():
-                continue
-
             prog_funcs = prog.funcs()
             for pf in prog_funcs:
                 sim = cosine_similarity(f.vec(), pf.vec())
@@ -67,12 +64,8 @@ class NaiveModel(AbstractModel):
 
         result = np.zeros(self._dim())
         if len(matched_tags) == 0:
-            # Find the index of the tag that represents a safe program.
-            for (i, t) in enumerate(self._repo.tags()):
-                if not t.is_vul():
-                    result[i] = 1
-                    break
-            return result
+            # Random predict.
+            return softmax(np.random.rand(self._dim()))
         else:
             for (t, count) in matched_tags.items():
                 tag_index = self._find_tag(t)

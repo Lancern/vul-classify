@@ -3,6 +3,7 @@ import logging
 import argparse
 
 from vulcls.train import train
+from vulcls.baseline import naive_baseline
 
 from vulcls.config import init_config
 from vulcls.config import app_config
@@ -27,6 +28,8 @@ def init_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Model daemon for vul-classify Viper plugin.')
     parser.add_argument('-c', '--config', type=str, required=False, default='vul-classify.config.json', metavar='path',
                         dest='config_file', help='specify the path of the configuration file.')
+    parser.add_argument('-b', '--baseline', action='store_true', dest='baseline',
+                        help='launch the process in baseline mode.')
     parser.add_argument('-t', '--train', action='store_true', dest='train',
                         help='launch the process in train mode.')
 
@@ -128,7 +131,7 @@ def init_models():
     init_root_model(models_loaded)
 
 
-def startup() -> bool:
+def startup() -> str:
     parser = init_arg_parser()
     args = parser.parse_args()
 
@@ -148,19 +151,28 @@ def startup() -> bool:
     init_asm2vec()
 
     # Initialize models.
-    init_models()
+    # init_models()
 
-    return not args.train
+    if args.train:
+        return 'train'
+    elif args.baseline:
+        return 'baseline'
+    else:
+        return 'daemon'
 
 
 def main() -> int:
     # System startup
-    if startup():
-        # Start the HTTP daemon.
-        return start_httpd()
-    else:
+    mode = startup()
+    if mode == 'baseline':
+        # The process is launched in baseline mode.
+        return naive_baseline()
+    elif mode == 'train':
         # The process is launched in train mode.
         return train()
+    else:
+        # # Start the HTTP daemon.
+        return start_httpd()
 
 
 exit(main())

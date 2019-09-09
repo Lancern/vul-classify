@@ -7,7 +7,7 @@ import numpy as np
 
 import asm2vec.parse
 
-from vulcls.asm import get_asm2vec
+from .asm2vec import get_asm2vec
 
 
 class Function:
@@ -133,16 +133,16 @@ def deserialize_repo(filename: str) -> Repository:
     with open(filename, 'rb') as fp:
         repo_data = umsgpack.unpack(fp)
 
-    func_callees = dict(map(lambda x: (x['id'], x['callees']), repo_data['funcs'].values()))
-    funcs = dict(map(lambda x: (x['id'], Function(x['id'], x['name'], np.array(x['vec']))), repo_data['funcs'].values()))
-    for fn in funcs:
+    func_callees = dict(map(lambda x: (x[b'id'], x[b'callees']), repo_data[b'funcs'].values()))
+    funcs = dict(map(lambda x: (x[b'id'], Function(x[b'id'], x[b'name'], np.array(x[b'vec']))), repo_data[b'funcs'].values()))
+    for fn in funcs.values():
         for callee_id in func_callees[fn.id()]:
             fn.add_callee(funcs[callee_id])
 
     repo = Repository()
-    for program_data in repo_data['programs']:
-        program = Program(program_data['name'], ProgramTag(program_data['label']))
-        for fid in program_data['entries']:
+    for program_data in repo_data[b'programs']:
+        program = Program(program_data[b'name'], ProgramTag(program_data[b'label']))
+        for fid in program_data[b'entries']:
             program.add_entry(funcs[fid])
 
         repo.add_program(program)
@@ -164,7 +164,7 @@ def from_asm_file(file_name: str) -> Program:
         v = model.to_vec(fn)
         funcs[fn.id()] = Function(fn.id(), fn.name(), v)
 
-        logging.debug('Function "%s" evaluated. Progress: %f%%', fn.name(), progress / len(asm2vec_funcs))
+        logging.debug('Function "%s" evaluated. Progress: %f%%', fn.name(), progress / len(asm2vec_funcs) * 100)
         progress += 1
 
     logging.debug('Functions evaluated. Fixing function call relations')
