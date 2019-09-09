@@ -1,17 +1,23 @@
 from typing import *
 
+import umsgpack
+
 import numpy as np
 
 
 class Function:
-    def __init__(self, func_id: int, v: np.ndarray):
+    def __init__(self, func_id: int, name: str, v: np.ndarray):
         self._id = func_id
+        self._name = name
         self._callees = []
         self._callers = []
         self._v = v
 
     def id(self) -> int:
         return self._id
+
+    def name(self) -> str:
+        return self._name
 
     def callees(self) -> List['Function']:
         return self._callees
@@ -32,32 +38,29 @@ class Function:
 
 
 class ProgramTag:
-    def __init__(self, vul_cat: str = None):
-        self._cat = vul_cat
+    def __init__(self, label: int):
+        self._label = label
 
     def __eq__(self, other):
         if not isinstance(other, ProgramTag):
             return False
-        return self._cat == other._cat
+        return self._label == other._label
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        return hash(self._cat)
+        return hash(self._label)
 
-    def is_vul(self) -> bool:
-        return self._cat is not None
-
-    def vul_category(self) -> str:
-        return self._cat
+    def label(self) -> int:
+        return self._label
 
 
 class Program:
-    def __init__(self, name: str, entry: Function):
+    def __init__(self, name: str, tag: ProgramTag):
         self._name = name
-        self._tag = ProgramTag()
-        self._entry = entry
+        self._tag = tag
+        self._entries = []
 
     def name(self) -> str:
         return self._name
@@ -65,11 +68,27 @@ class Program:
     def tag(self) -> ProgramTag:
         return self._tag
 
-    def set_tag(self, tag: ProgramTag) -> None:
-        self._tag = tag
+    def entries(self) -> List[Function]:
+        return self._entries
 
-    def entry(self) -> Function:
-        return self._entry
+    def add_entry(self, f: Function) -> None:
+        self._entries.append(f)
+
+    def funcs(self) -> List[Function]:
+        reachable = []
+        visited_funcs = set(map(lambda f: f.id(), self._entries))
+
+        fn = self._entries[:]
+        while len(fn) > 0:
+            current_fn = fn.pop()
+            reachable.append(current_fn)
+            for callee_fn in current_fn.callees():
+                if callee_fn.id() in visited_funcs:
+                    continue
+                visited_funcs.add(callee_fn.id())
+                fn.append(callee_fn)
+
+        return reachable
 
 
 class Repository:
@@ -93,85 +112,25 @@ class Repository:
         return self._programs
 
 
-def walk_functions(entry: Function, handler: Callable[[Function], Any]) -> None:
-    visited_funcs = set()
+def deserialize_repo(filename: str) -> Repository:
+    with open(filename, 'rb') as fp:
+        repo_data = umsgpack.unpack(fp)
 
-    def _walk(curr: Function) -> None:
-        if curr.id() in visited_funcs:
-            return
+    func_callees = dict(map(lambda x: (x['id'], x['callees']), repo_data['funcs'].values()))
+    funcs = dict(map(lambda x: (x['id'], Function(x['id'], x['name'], np.array(x['vec']))), repo_data['funcs'].values()))
+    for fn in funcs:
+        for callee_id in func_callees[fn.id()]:
+            fn.add_callee(funcs[callee_id])
 
-        visited_funcs.add(curr.id())
-        handler(curr)
-
-        for next_func in curr.callees():
-            _walk(next_func)
-
-    _walk(entry)
-
-
-def collect_functions(entry: Function) -> List[Function]:
-    fn = []
-
-    def handler(f: Function) -> None:
-        fn.append(f)
-
-    walk_functions(entry, handler)
-    return fn
-
-
-def serialize_repo(repo: Repository) -> Dict[str, Any]:
-    programs_rep = []
-    for prog in repo.programs():
-        prog_rep = {
-            'name': prog.name(),
-            'tag': prog.tag().vul_category(),
-            'funcs': [],
-            'entry': prog.entry().id()
-        }
-
-        for func in collect_functions(prog.entry()):
-            func_rep = {
-                'id': func.id(),
-                'vec': list(func.vec()),
-                'callees': list(map(lambda f: f.id(), func.callees()))
-            }
-            prog_rep['funcs'].append(func_rep)
-
-        programs_rep.append(prog_rep)
-
-    return {'programs': programs_rep}
-
-
-def deserialize_repo(rep: Dict[str, Any]) -> Repository:
     repo = Repository()
+    for program_data in repo_data['programs']:
+        program = Program(program_data['name'], ProgramTag(program_data['label']))
+        for fid in program_data['entries']:
+            program.add_entry(funcs[fid])
 
-    for prog_rep in rep['programs']:
-        name = prog_rep['name']
-        tag = ProgramTag(prog_rep['tag'])
-        entry = prog_rep['entry']
-
-        # Deserialize function call graph.
-        funcs = dict()
-        func_callees = dict()
-        for func_rep in prog_rep['funcs']:
-            fid = func_rep['id']
-            vec = np.array(func_rep['vec'])
-            callees = func_rep['callees']
-
-            func_callees[fid] = callees
-            funcs[fid] = Function(fid, vec)
-
-        # Fix function call relations.
-        for f in funcs:
-            for callee_id in func_callees[f.id()]:
-                f.add_callee(funcs[callee_id])
-
-        prog = Program(name, funcs[entry])
-        prog.set_tag(tag)
-        repo.add_program(prog)
+        repo.add_program(program)
 
     return repo
 
 
-__all__ = ['Function', 'ProgramTag', 'Program', 'Repository', 'walk_functions', 'collect_functions',
-           'serialize_repo', 'deserialize_repo']
+__all__ = ['Function', 'ProgramTag', 'Program', 'Repository', 'deserialize_repo']

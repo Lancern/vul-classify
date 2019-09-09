@@ -3,3 +3,4 @@ flask
 xgboost
 torch
 r2pipe
+umsgpack
