@@ -1,8 +1,6 @@
 import numpy as np
 import xgboost as xgb
 
-from vulcls.asm import collect_functions
-
 from .base import AbstractModel
 
 

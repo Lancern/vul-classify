@@ -17,6 +17,14 @@ from vulcls.models import load_model_object
 
 from vulcls.httpd.app import start_httpd
 
+# Add path to asm2vec to python path.
+import os
+asm2vec_path = os.getenv('ASM2VEC_PATH')
+if asm2vec_path is not None:
+    sys.path.append(asm2vec_path)
+
+import asm2vec.asm
+
 
 if __name__ != '__main__':
     raise Exception('main.py should not be imported as a module.')
@@ -141,6 +149,8 @@ def startup() -> bool:
 
 
 def main() -> int:
+    instr = asm2vec.asm.parse_instruction('mov eax, ebx')
+
     # System startup
     if startup():
         # Start the HTTP daemon.
