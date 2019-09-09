@@ -57,7 +57,7 @@ class ProgramTag:
 
 
 class Program:
-    def __init__(self, name: str, tag: ProgramTag):
+    def __init__(self, name: str, tag: ProgramTag = None):
         self._name = name
         self._tag = tag
         self._entries = []

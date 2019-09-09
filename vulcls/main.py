@@ -11,17 +11,12 @@ from vulcls.thread_pool import init_thread_pool as init_tp
 from vulcls.asm import set_global_repo
 from vulcls.asm import get_global_repo
 from vulcls.asm import deserialize_repo
+from vulcls.asm import init_asm2vec as init_a2v
 
 from vulcls.models import init_root_model
 from vulcls.models import load_model_object
 
 from vulcls.httpd.app import start_httpd
-
-# Add path to asm2vec to python path.
-import os
-asm2vec_path = os.getenv('ASM2VEC_PATH')
-if asm2vec_path is not None:
-    sys.path.append(asm2vec_path)
 
 
 if __name__ != '__main__':
@@ -99,6 +94,15 @@ def init_repo():
     logging.debug('%d programs loaded from repository', len(get_global_repo().programs()))
 
 
+def init_asm2vec():
+    asm2vec_file_name = app_config().get('asm2vec.memento', None)
+    if asm2vec_file_name is None:
+        logging.error('Memento file for asm2vec is not found in configuration.')
+        exit(-1)
+
+    init_a2v(asm2vec_file_name)
+
+
 def init_models():
     logging.info('Loading models')
 
@@ -139,6 +143,9 @@ def startup() -> bool:
 
     # Initialize repository.
     init_repo()
+
+    # Initialize asm2vec.
+    init_asm2vec()
 
     # Initialize models.
     init_models()

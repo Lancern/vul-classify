@@ -26,6 +26,9 @@
       "data_file": "data/models/xgb.bin"
     }
   ],
+  "asm2vec": {
+    "memento": "asm2vec-model.msgpack"
+  },
   "daemon": {
     "address": "127.0.0.1",
     "port": 8080
