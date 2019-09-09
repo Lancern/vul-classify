@@ -10,21 +10,27 @@
     {
       "file": "models/naive.py",
       "module": "vulcls.models.naive",
-      "name": "NaiveModel"
+      "name": "NaiveModel",
+      "data_file": "data/models/naive.bin"
     },
     {
       "file": "models/lstm.py",
       "module": "vulcls.models.lstm",
-      "name": "LSTMModel"
+      "name": "LSTMModel",
+      "data_file": "data/models/lstm.bin"
     },
     {
       "file": "models/xgb.py",
       "module": "vulcls.models.xgb",
-      "name": "XGBModel"
+      "name": "XGBModel",
+      "data_file": "data/models/xgb.bin"
     }
   ],
   "daemon": {
     "address": "127.0.0.1",
     "port": 8080
+  },
+  "repo": {
+    "filename": "vulcls-repo.msgpack"
   }
 }

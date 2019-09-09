@@ -20,6 +20,7 @@ def classify():
 
 def start_httpd():
     app.run()
+    return 0
 
 
 __all__ = ['start_httpd']

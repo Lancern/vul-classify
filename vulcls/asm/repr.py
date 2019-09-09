@@ -112,6 +112,18 @@ class Repository:
         return self._programs
 
 
+_global_repo: Optional[Repository] = None
+
+
+def set_global_repo(repo: Repository):
+    global _global_repo
+    _global_repo = repo
+
+
+def get_global_repo() -> Repository:
+    return _global_repo
+
+
 def deserialize_repo(filename: str) -> Repository:
     with open(filename, 'rb') as fp:
         repo_data = umsgpack.unpack(fp)
@@ -133,4 +145,4 @@ def deserialize_repo(filename: str) -> Repository:
     return repo
 
 
-__all__ = ['Function', 'ProgramTag', 'Program', 'Repository', 'deserialize_repo']
+__all__ = ['Function', 'ProgramTag', 'Program', 'Repository', 'set_global_repo', 'get_global_repo', 'deserialize_repo']

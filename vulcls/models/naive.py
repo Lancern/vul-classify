@@ -6,7 +6,6 @@ from vulcls.asm import Repository
 from vulcls.asm import Program
 from vulcls.asm import ProgramTag
 from vulcls.asm import Function
-from vulcls.asm import collect_functions
 
 from .base import AbstractModel
 from .utils import softmax
@@ -41,7 +40,7 @@ class NaiveModel(AbstractModel):
             if not prog.tag().is_vul():
                 continue
 
-            prog_funcs = collect_functions(prog.entry())
+            prog_funcs = prog.funcs()
             for pf in prog_funcs:
                 sim = cosine_similarity(f.vec(), pf.vec())
                 if sim >= self._params.sim_threshold:
@@ -55,7 +54,7 @@ class NaiveModel(AbstractModel):
 
     def predict(self, repo: Repository, target: Program) -> np.ndarray:
         self._repo = repo
-        target_funcs = collect_functions(target.entry())
+        target_funcs = target.funcs()
 
         matched_tags = dict()
         for tf in target_funcs:
@@ -86,7 +85,7 @@ class NaiveModel(AbstractModel):
         # Nothing to do here.
         return None
 
-    def deserialize(self, file_name: str) -> None:
+    def populate(self, file_name: str) -> None:
         # Nothing to do here.
         pass
 
