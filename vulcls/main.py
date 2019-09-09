@@ -23,8 +23,6 @@ asm2vec_path = os.getenv('ASM2VEC_PATH')
 if asm2vec_path is not None:
     sys.path.append(asm2vec_path)
 
-import asm2vec.asm
-
 
 if __name__ != '__main__':
     raise Exception('main.py should not be imported as a module.')
