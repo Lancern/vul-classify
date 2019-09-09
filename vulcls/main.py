@@ -147,8 +147,6 @@ def startup() -> bool:
 
 
 def main() -> int:
-    instr = asm2vec.asm.parse_instruction('mov eax, ebx')
-
     # System startup
     if startup():
         # Start the HTTP daemon.
