@@ -1,8 +1,13 @@
 from typing import *
+import logging
 
 import umsgpack
 
 import numpy as np
+
+import asm2vec.parse
+
+from vulcls.asm import get_asm2vec
 
 
 class Function:
@@ -145,4 +150,40 @@ def deserialize_repo(filename: str) -> Repository:
     return repo
 
 
-__all__ = ['Function', 'ProgramTag', 'Program', 'Repository', 'set_global_repo', 'get_global_repo', 'deserialize_repo']
+def from_asm_file(file_name: str) -> Program:
+    logging.debug('Load program from file "%s"', file_name)
+
+    asm2vec_funcs = asm2vec.parse.parse(file_name)
+
+    model = get_asm2vec()
+    funcs = dict()
+
+    progress = 1
+    for fn in asm2vec_funcs:
+        logging.debug('')
+        v = model.to_vec(fn)
+        funcs[fn.id()] = Function(fn.id(), fn.name(), v)
+
+        logging.debug('Function "%s" evaluated. Progress: %f%%', fn.name(), progress / len(asm2vec_funcs))
+        progress += 1
+
+    logging.debug('Functions evaluated. Fixing function call relations')
+    for fn in asm2vec_funcs:
+        for callee_id in map(lambda f: f.id(), fn.callees()):
+            funcs[fn.id()].add_callee(funcs[callee_id])
+
+    logging.debug('Finding entry functions')
+    visited_funcs = set()
+    program = Program(file_name)
+    for fn in funcs.values():
+        for callee_id in map(lambda f: f.id(), fn.callees()):
+            visited_funcs.add(callee_id)
+    for fn in funcs.values():
+        if fn.id() not in visited_funcs:
+            program.add_entry(fn)
+
+    return program
+
+
+__all__ = ['Function', 'ProgramTag', 'Program', 'Repository', 'set_global_repo', 'get_global_repo', 'deserialize_repo',
+           'from_asm_file']
