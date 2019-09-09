@@ -29,11 +29,11 @@ class WeightedMajorityVoting(AbstractModel):
         y = np.vstack(predictions)
         return softmax(np.matmul(self._w, y))
 
-    def serialize(self) -> Any:
+    def serialize(self, file_name: str) -> None:
         # Nothing to do here.
         return None
 
-    def deserialize(self, rep: Any) -> None:
+    def deserialize(self, file_name: str) -> None:
         # Nothing to do here.
         pass
 

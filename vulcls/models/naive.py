@@ -82,11 +82,11 @@ class NaiveModel(AbstractModel):
                 result[tag_index] = count
             return softmax(result)
 
-    def serialize(self) -> Any:
+    def serialize(self, file_name: str) -> None:
         # Nothing to do here.
         return None
 
-    def deserialize(self, rep: Any) -> None:
+    def deserialize(self, file_name: str) -> None:
         # Nothing to do here.
         pass
 

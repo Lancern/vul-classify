@@ -1,5 +1,3 @@
-from typing import *
-
 import sys
 import logging
 import argparse
@@ -86,11 +84,12 @@ def init_models():
     models_loaded = []
     for model in models_to_load:
         model_file = model['file']
+        model_module = model['module']
         model_name = model['name']
 
         logging.debug('Loading model "%s" from file "%s"', model_name, model_file)
 
-        model = load_model_object(model_file, model_name)
+        model = load_model_object(model_file, model_module, model_name)
         models_loaded.append(model)
 
     logging.debug('%d models loaded.', len(models_loaded))
@@ -99,9 +98,9 @@ def init_models():
     init_root_model(models_loaded)
 
 
-def startup(argv: List[str]) -> None:
+def startup() -> None:
     parser = init_arg_parser()
-    args = parser.parse_args(argv)
+    args = parser.parse_args()
 
     # Initialize application configuration.
     init_config(args.config_file)
@@ -116,9 +115,9 @@ def startup(argv: List[str]) -> None:
     init_models()
 
 
-def main(argv: List[str]) -> int:
+def main() -> int:
     # System startup
-    startup(argv)
+    startup()
 
     # Start the HTTP daemon.
     start_httpd()
@@ -126,4 +125,4 @@ def main(argv: List[str]) -> int:
     return 0
 
 
-exit(main(sys.argv))
+exit(main())

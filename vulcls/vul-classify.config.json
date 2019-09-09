@@ -9,14 +9,17 @@
   "models": [
     {
       "file": "models/naive.py",
+      "module": "vulcls.models.naive",
       "name": "NaiveModel"
     },
     {
       "file": "models/lstm.py",
+      "module": "vulcls.models.lstm",
       "name": "LSTMModel"
     },
     {
       "file": "models/xgb.py",
+      "module": "vulcls.models.xgb",
       "name": "XGBModel"
     }
   ],
