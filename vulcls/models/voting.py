@@ -15,6 +15,9 @@ class WeightedMajorityVoting(AbstractModel):
         self._models = models
         self._w = np.ones(len(models))
 
+    def underlying_models(self) -> List[AbstractModel]:
+        return self._models
+
     def train(self, repo: Repository) -> None:
         def train_model(model: AbstractModel) -> None:
             model.train(repo)
@@ -33,7 +36,7 @@ class WeightedMajorityVoting(AbstractModel):
         # Nothing to do here.
         return None
 
-    def deserialize(self, file_name: str) -> None:
+    def populate(self, file_name: str) -> None:
         # Nothing to do here.
         pass
 

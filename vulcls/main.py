@@ -2,9 +2,17 @@ import sys
 import logging
 import argparse
 
+from vulcls.train import train
+from vulcls.baseline import naive_baseline
+
 from vulcls.config import init_config
 from vulcls.config import app_config
 from vulcls.thread_pool import init_thread_pool as init_tp
+
+from vulcls.asm import set_global_repo
+from vulcls.asm import get_global_repo
+from vulcls.asm import deserialize_repo
+from vulcls.asm import init_asm2vec as init_a2v
 
 from vulcls.models import init_root_model
 from vulcls.models import load_model_object
@@ -20,6 +28,10 @@ def init_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description='Model daemon for vul-classify Viper plugin.')
     parser.add_argument('-c', '--config', type=str, required=False, default='vul-classify.config.json', metavar='path',
                         dest='config_file', help='specify the path of the configuration file.')
+    parser.add_argument('-b', '--baseline', action='store_true', dest='baseline',
+                        help='launch the process in baseline mode.')
+    parser.add_argument('-t', '--train', action='store_true', dest='train',
+                        help='launch the process in train mode.')
 
     return parser
 
@@ -73,6 +85,27 @@ def init_thread_pool():
     init_tp(workers)
 
 
+def init_repo():
+    repo_file_name = app_config().get('repo.filename', None)
+    if repo_file_name is None:
+        logging.error('No repository file found in configuration.')
+        exit(-1)
+
+    logging.info('Loading global repository from file "%s"', repo_file_name)
+    set_global_repo(deserialize_repo(repo_file_name))
+
+    logging.debug('%d programs loaded from repository', len(get_global_repo().programs()))
+
+
+def init_asm2vec():
+    asm2vec_file_name = app_config().get('asm2vec.memento', None)
+    if asm2vec_file_name is None:
+        logging.error('Memento file for asm2vec is not found in configuration.')
+        exit(-1)
+
+    init_a2v(asm2vec_file_name)
+
+
 def init_models():
     logging.info('Loading models')
 
@@ -98,7 +131,7 @@ def init_models():
     init_root_model(models_loaded)
 
 
-def startup() -> None:
+def startup() -> str:
     parser = init_arg_parser()
     args = parser.parse_args()
 
@@ -111,18 +144,35 @@ def startup() -> None:
     # Initialize thread pool.
     init_thread_pool()
 
+    # Initialize repository.
+    init_repo()
+
+    # Initialize asm2vec.
+    init_asm2vec()
+
     # Initialize models.
-    init_models()
+    # init_models()
+
+    if args.train:
+        return 'train'
+    elif args.baseline:
+        return 'baseline'
+    else:
+        return 'daemon'
 
 
 def main() -> int:
     # System startup
-    startup()
-
-    # Start the HTTP daemon.
-    start_httpd()
-
-    return 0
+    mode = startup()
+    if mode == 'baseline':
+        # The process is launched in baseline mode.
+        return naive_baseline()
+    elif mode == 'train':
+        # The process is launched in train mode.
+        return train()
+    else:
+        # # Start the HTTP daemon.
+        return start_httpd()
 
 
 exit(main())

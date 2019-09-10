@@ -4,3 +4,4 @@ venv/
 vulcls/trainset/
 vulcls/model/
 vulcls/train_xgb.py
+vul-classift.config.json

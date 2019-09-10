@@ -15,7 +15,7 @@ from .utils import cosine_similarity
 class NaiveModel(AbstractModel):
     class NaiveModelParams:
         def __init__(self, **kwargs):
-            self.sim_threshold = kwargs.get('sim_threshold', 0.6)
+            self.sim_threshold = kwargs.get('sim_threshold', 0.2)
 
     def __init__(self, **kwargs):
         self._repo = None
@@ -37,10 +37,7 @@ class NaiveModel(AbstractModel):
     def _predict_func(self, f: Function) -> Dict[ProgramTag, int]:
         matched_tags = dict()
         for prog in self._repo.programs():
-            if not prog.tag().is_vul():
-                continue
-
-            prog_funcs = collect_functions(prog.entry())
+            prog_funcs = prog.funcs()
             for pf in prog_funcs:
                 sim = cosine_similarity(f.vec(), pf.vec())
                 if sim >= self._params.sim_threshold:
@@ -54,7 +51,7 @@ class NaiveModel(AbstractModel):
 
     def predict(self, repo: Repository, target: Program) -> np.ndarray:
         self._repo = repo
-        target_funcs = collect_functions(target.entry())
+        target_funcs = target.funcs()
 
         matched_tags = dict()
         for tf in target_funcs:
@@ -67,12 +64,8 @@ class NaiveModel(AbstractModel):
 
         result = np.zeros(self._dim())
         if len(matched_tags) == 0:
-            # Find the index of the tag that represents a safe program.
-            for (i, t) in enumerate(self._repo.tags()):
-                if not t.is_vul():
-                    result[i] = 1
-                    break
-            return result
+            # Random predict.
+            return softmax(np.random.rand(self._dim()))
         else:
             for (t, count) in matched_tags.items():
                 tag_index = self._find_tag(t)
@@ -85,7 +78,7 @@ class NaiveModel(AbstractModel):
         # Nothing to do here.
         return None
 
-    def deserialize(self, file_name: str) -> None:
+    def populate(self, file_name: str) -> None:
         # Nothing to do here.
         pass
 

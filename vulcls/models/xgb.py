@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import xgboost as xgb
+import pickle
 
 from .base import AbstractModel
 
@@ -60,9 +61,14 @@ class XGBModel(AbstractModel):
         return y_pred
 
     def serialize(self, file_name):
-        self._model.save_model(file_name)
+        # self._model.save_model(file_name)
+        with open(file_name, 'wb') as model_file:
+            pickle.dump(self._model, model_file)
+
 
     def populate(self, file_name):
-        self._model.load_model(file_name)
+        # self._model.load_model(file_name)
+        with open(file_name, 'rb') as model_file:
+            self._model = pickle.load(model_file)
 
 __all__ = ['XGBModel']
