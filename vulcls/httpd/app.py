@@ -4,6 +4,8 @@ import tempfile
 
 import flask
 
+from vulcls.config import app_config
+
 from vulcls.asm import disassemble_fp
 from vulcls.asm import from_asm_file_fp
 from vulcls.asm import get_global_repo
@@ -58,7 +60,10 @@ def classify():
 
 
 def start_httpd():
-    app.run()
+    address = app_config().get('daemon.address', '127.0.0.1')
+    port = app_config().get('daemon.port', 8080)
+
+    app.run(host=address, port=port)
     return 0
 
 
