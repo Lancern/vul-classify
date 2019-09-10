@@ -15,7 +15,7 @@ from .utils import cosine_similarity
 class NaiveModel(AbstractModel):
     class NaiveModelParams:
         def __init__(self, **kwargs):
-            self.sim_threshold = kwargs.get('sim_threshold', 0.6)
+            self.sim_threshold = kwargs.get('sim_threshold', 0.2)
 
     def __init__(self, **kwargs):
         self._repo = None

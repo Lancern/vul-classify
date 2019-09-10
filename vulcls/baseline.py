@@ -1,6 +1,5 @@
 from typing import *
 import logging
-import json
 import os
 import random
 
@@ -107,9 +106,11 @@ def naive_baseline():
         progress += 1
 
     logging.info('Baseline test for Naive Model complete.')
-    logging.info('Saving baseline result to file "naive-baseline-result.json"')
-    with open('naive-baseline-result.json', 'w') as fp:
-        json.dump(counters, fp, indent=2)
+    logging.info('Saving baseline result to file "naive-baseline-result.csv"')
+    with open('naive-baseline-result.csv', 'w') as fp:
+        fp.write(','.join(map(str, counters.keys())) + '\n')
+        for c in counters.values():
+            fp.write(','.join(map(str, c.values())) + '\n')
 
     logging.info('Done')
 
