@@ -2,8 +2,6 @@ import os
 import numpy as np
 import xgboost as xgb
 
-from vulcls.asm import collect_functions
-
 from .base import AbstractModel
 
 
@@ -31,24 +29,29 @@ class XGBModel(AbstractModel):
         X_train = []
         y_train = []
         for program in programs:
-            funcs = collect_functions(program.entry())
+            funcs = program.funcs()
+            if len(funcs) == 0:
+                continue
+
             vecs = [func.vec() for func in funcs]
         
-        X_train.append(_all_reduce(vecs))
-        y_train.append(program.tag())
+            X_train.append(_all_reduce(vecs))
+            y_train.append(program.tag().label())
 
         X_train = np.array(X_train)
         y_train = np.array(y_train)
         
         self._model.fit(X_train, y_train,
                         eval_set=[(X_train, y_train)],
-                        eval_metric='mlogloss')
-            
-    def predict(self, repo, target):
-        self.train(repo)
+                        eval_metric='mlogloss',
+                        verbose=False)
 
-        funcs = collect_functions(target.entry())
-        vecs = [func.vecs() for func in funcs]
+    def predict(self, repo, target):
+        if repo is not None:
+            self.train(repo)
+
+        funcs = target.funcs()
+        vecs = [func.vec() for func in funcs]
         
         X_test = np.array([_all_reduce(vecs)])
         
@@ -56,10 +59,10 @@ class XGBModel(AbstractModel):
         
         return y_pred
 
-    def save_model(self, model_dir='model/xgb_model'):
-        self._model.save_model(model_dir)
+    def serialize(self, file_name):
+        self._model.save_model(file_name)
 
-    def load_model(self, model_dir='model/xgb_model'):
-        self._model.load_model(model_dir)
+    def populate(self, file_name):
+        self._model.load_model(file_name)
 
 __all__ = ['XGBModel']

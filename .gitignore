@@ -1,3 +1,6 @@
 .DS_Store
 .idea/
 venv/
+vulcls/trainset/
+vulcls/model/
+vulcls/train_xgb.py

@@ -6,7 +6,6 @@ from vulcls.asm import Repository
 from vulcls.asm import Program
 from vulcls.asm import ProgramTag
 from vulcls.asm import Function
-from vulcls.asm import collect_functions
 
 from .base import AbstractModel
 from .utils import softmax
