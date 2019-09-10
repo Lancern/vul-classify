@@ -150,10 +150,8 @@ def deserialize_repo(filename: str) -> Repository:
     return repo
 
 
-def from_asm_file(file_name: str) -> Program:
-    logging.debug('Load program from file "%s"', file_name)
-
-    asm2vec_funcs = asm2vec.parse.parse(file_name)
+def from_asm_file_fp(fp, program_name: str) -> Program:
+    asm2vec_funcs = asm2vec.parse.parse_fp(fp)
 
     model = get_asm2vec()
     funcs = dict()
@@ -174,7 +172,7 @@ def from_asm_file(file_name: str) -> Program:
 
     logging.debug('Finding entry functions')
     visited_funcs = set()
-    program = Program(file_name)
+    program = Program(program_name)
     for fn in funcs.values():
         for callee_id in map(lambda f: f.id(), fn.callees()):
             visited_funcs.add(callee_id)
@@ -185,5 +183,10 @@ def from_asm_file(file_name: str) -> Program:
     return program
 
 
+def from_asm_file(file_name: str) -> Program:
+    with open(file_name, 'r') as fp:
+        return from_asm_file_fp(fp, file_name)
+
+
 __all__ = ['Function', 'ProgramTag', 'Program', 'Repository', 'set_global_repo', 'get_global_repo', 'deserialize_repo',
-           'from_asm_file']
+           'from_asm_file', 'from_asm_file_fp']
