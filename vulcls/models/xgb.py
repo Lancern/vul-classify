@@ -1,7 +1,9 @@
 import os
-import numpy as np
-import xgboost as xgb
 import pickle
+
+import numpy as np
+
+import xgboost as xgb
 
 from .base import AbstractModel
 
@@ -45,7 +47,7 @@ class XGBModel(AbstractModel):
         self._model.fit(X_train, y_train,
                         eval_set=[(X_train, y_train)],
                         eval_metric='mlogloss',
-                        verbose=False)
+                        verbose=True)
 
     def predict(self, repo, target):
         if repo is not None:
@@ -56,7 +58,7 @@ class XGBModel(AbstractModel):
         
         X_test = np.array([_all_reduce(vecs)])
         
-        y_pred = self._model.predict_proba(X_test)
+        y_pred = self._model.predict_proba(X_test)[0]
         
         return y_pred
 
