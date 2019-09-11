@@ -65,24 +65,12 @@ def load_test_set() -> List[Tuple[Program, ProgramTag]]:
     return test_set
 
 
-def load_counters(test_set: List[Tuple[Program, ProgramTag]]) -> Dict[int, Dict[int, int]]:
-    return dict(
-        map(
-            lambda t: (
-                t[1].label(),
-                dict(
-                    map(
-                        lambda p: (
-                            p[1].label(),
-                            0
-                        ),
-                        test_set
-                    )
-                )
-            ),
-            test_set
-        )
-    )
+def load_counters() -> Dict[int, Dict[int, int]]:
+    labels = list(map(lambda t: t.label(), get_global_repo().tags()))
+    counters = dict()
+    for lb in labels:
+        counters[lb] = dict(zip(labels, [0] * len(labels)))
+    return counters
 
 
 def naive_baseline():
@@ -92,8 +80,8 @@ def naive_baseline():
     test_set = load_test_set()
     logging.debug('%d programs loaded from test set', len(test_set))
 
-    model = NaiveModel()
-    counters = load_counters(test_set)
+    model = NaiveModel(sim_threshold=0.15)
+    counters = load_counters()
 
     progress = 1
     for (program, actual_tag) in test_set:
