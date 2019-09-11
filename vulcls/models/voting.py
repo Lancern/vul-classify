@@ -13,7 +13,7 @@ from .utils import softmax
 class WeightedMajorityVoting(AbstractModel):
     def __init__(self, models: List[AbstractModel]):
         self._models = models
-        self._w = np.ones(len(models))
+        self._w = np.array([0.1, 0.3, 0.6])
 
     def underlying_models(self) -> List[AbstractModel]:
         return self._models

@@ -47,13 +47,15 @@ class XGBModel(AbstractModel):
         self._model.fit(X_train, y_train,
                         eval_set=[(X_train, y_train)],
                         eval_metric='mlogloss',
-                        verbose=True)
+                        verbose=False)
 
     def predict(self, repo, target):
-        if repo is not None:
-            self.train(repo)
-
         funcs = target.funcs()
+        if len(funcs) == 0:
+            t = np.random.random((9))
+            t = np.exp(t)
+            return t/np.sum(t)
+
         vecs = [func.vec() for func in funcs]
         
         X_test = np.array([_all_reduce(vecs)])

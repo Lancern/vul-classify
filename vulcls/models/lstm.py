@@ -21,6 +21,7 @@ from vulcls.asm import ProgramTag
 def transform(prog, precesion=.01):
     functions = {}
     queue = prog.entries()
+    pdb.set_trace()
     for func in queue:
         functions[func.id()] = func
     start, end = 0, len(queue)
@@ -91,6 +92,10 @@ class LSTMModel(AbstractModel):
             torch.cuda.empty_cache()
 
     def predict(self, repo, prog):
+        if len(prog.funcs()) == 0:
+            t = np.random.random((9))
+            t = np.exp(t)
+            return t/np.sum(t)
         feature = transform(prog)
         feature = feature.reshape((1,)+feature.shape)
         assert len(feature.shape) == 3 and feature.shape[0] == 1, "feature must be [1, seq_length, feat_dim]"

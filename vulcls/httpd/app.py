@@ -25,7 +25,7 @@ def classify():
         return flask.Response(status=400)
 
     # Generate a temporary file to hold the disassembled assembly code.
-    with tempfile.TemporaryFile(mode='w') as asm_file_fp:
+    with tempfile.TemporaryFile(mode='w+') as asm_file_fp:
         logging.debug('Disassembling file "%s" into "%s"', file_path, asm_file_fp.name)
 
         # noinspection PyBroadException

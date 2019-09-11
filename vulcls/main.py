@@ -119,10 +119,14 @@ def init_models():
         model_file = model['file']
         model_module = model['module']
         model_name = model['name']
+        model_data_file = model.get('data_file', None)
 
         logging.debug('Loading model "%s" from file "%s"', model_name, model_file)
 
         model = load_model_object(model_file, model_module, model_name)
+        if model_data_file is not None:
+            logging.debug('Populate model data from file "%s"', model_data_file)
+            model.populate(model_data_file)
         models_loaded.append(model)
 
     logging.debug('%d models loaded.', len(models_loaded))
@@ -151,7 +155,7 @@ def startup() -> str:
     init_asm2vec()
 
     # Initialize models.
-    # init_models()
+    init_models()
 
     if args.train:
         return 'train'

@@ -4,3 +4,5 @@ xgboost
 torch
 r2pipe
 umsgpack
+pandas
+sklearn
