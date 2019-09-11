@@ -1,4 +1,5 @@
 from typing import *
+import logging
 
 import numpy as np
 
@@ -13,7 +14,8 @@ from .utils import softmax
 class WeightedMajorityVoting(AbstractModel):
     def __init__(self, models: List[AbstractModel]):
         self._models = models
-        self._w = np.array([0.1, 0.3, 0.6])
+        # self._w = np.array([0.1, 0.3, 0.6])
+        self._w = np.ones(len(models))
 
     def underlying_models(self) -> List[AbstractModel]:
         return self._models
@@ -26,7 +28,9 @@ class WeightedMajorityVoting(AbstractModel):
 
     def predict(self, repo: Repository, target: Program) -> np.ndarray:
         def predict_by(model: AbstractModel) -> np.ndarray:
-            return model.predict(repo, target)
+           model_result = model.predict(repo, target)
+           logging.debug('Result from model "%s": %s', model.__class__.__name__, model_result)
+           return model_result
 
         predictions = list(get_thread_pool().map(predict_by, self._models))
         y = np.vstack(predictions)

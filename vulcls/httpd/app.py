@@ -40,6 +40,12 @@ def classify():
         logging.debug('Load disassembled file')
         asm_file_fp.seek(0)
 
+        
+
+        with open('tmp.asm', 'w') as debug_fp:
+            debug_fp.write(asm_file_fp.read())
+        asm_file_fp.seek(0)
+
         try:
             target = from_asm_file_fp(asm_file_fp, os.path.basename(file_path))
         except Exception as ex:

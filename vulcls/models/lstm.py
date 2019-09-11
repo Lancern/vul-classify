@@ -21,7 +21,7 @@ from vulcls.asm import ProgramTag
 def transform(prog, precesion=.01):
     functions = {}
     queue = prog.entries()
-    pdb.set_trace()
+    # pdb.set_trace()
     for func in queue:
         functions[func.id()] = func
     start, end = 0, len(queue)
@@ -316,7 +316,10 @@ class Model(nn.Module):
 
     def load(self, path):
         model_dict = self.state_dict()
-        pretrained_dict = torch.load(path)
+        if torch.cuda.is_available():
+            pretrained_dict = torch.load(path)
+        else:
+            pretrained_dict = torch.load(path, map_location='cpu')
         model_dict.update(pretrained_dict)
         self.load_state_dict(model_dict)
 
