@@ -11,7 +11,7 @@ import pdb
 import umsgpack
 import pandas
 
-from base import AbstractModel
+from .base import AbstractModel
 from vulcls.asm import Repository
 from vulcls.asm import Program
 from vulcls.asm import Function
